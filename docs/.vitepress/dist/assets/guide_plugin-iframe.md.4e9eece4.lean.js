@@ -1,0 +1,1 @@
+import{_ as e,o as t,c as o,d as c}from"./app.69ebef6f.js";const u=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"guide/plugin-iframe.md"}'),a={name:"guide/plugin-iframe.md"},n=c("",1),_=[n];function d(i,r,s,m,l,p){return t(),o("div",null,_)}const h=e(a,[["render",d]]);export{u as __pageData,h as default};
