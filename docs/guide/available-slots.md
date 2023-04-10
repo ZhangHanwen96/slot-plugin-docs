@@ -21,22 +21,51 @@ layout: doc
 
 ## 可用 Slot 插槽
 
-| Slot Code                                                        | Accept Plugin Type |                                                        Description |
-| ---------------------------------------------------------------- | :----------------: | -----------------------------------------------------------------: |
-| <span class='componen-type' style="fontWeight: 600">entry</span> |      function      |                      entry 是特殊的插槽，具体见[entry](./entry.md) |
-| portal-detail-card                                               |     component      |                            portal 详情页，分享页面的自定义预览卡片 |
-| portal-header-action                                             |     component      |                                  portal 详情页的顶部自定义按钮插入 |
-| portal-detail-operation-more                                     |      function      |                          Portal 详情页的批量操作"**更多**"下拉选项 |
-| material-library-operation-more                                  |      function      | /dam_enterprise/approved_list 素材页面的批量操作"**更多**"下拉选项 |
+| Slot Code                                                        | Accept Plugin Type |                                    Description |
+| ---------------------------------------------------------------- | :----------------: | ---------------------------------------------: |
+| <span class='componen-type' style="fontWeight: 600">entry</span> |      function      | entry 是特殊的插槽，具体见 [entry](./entry.md) |
+| global-left-menu                                                 |      function      |                               左侧导航栏的链接 |
+| portal-header-action-left                                        |     component      |        portal 详情页的顶部自定义按钮'左侧'插入 |
+| portal-header-action-right                                       |      function      |        portal 详情页的顶部自定义按钮'右侧'插入 |
+| portal-detail-operation-more                                     |      function      |      Portal 详情页的批量操作"**更多**"下拉选项 |
+| material-library-operation-more                                  |      function      |           素材页面的批量操作"**更多**"下拉选项 |
+| material-library-operation-more                                  |      function      |           素材页面的批量操作"**更多**"下拉选项 |
 
 ## `entry` - 特殊 Slot
 细节见 [entry slot](./entry.md)
 
+## Interface
+```ts
+namespace PluginExport {
+    // pluginType=[component]
+    interface Component {
+        render: ((container: HTMLElement | ShadowRoot, props: any) => void);
+        cssString?: string;
+        useShadowDom?: boolean;
+    }
+    // slotCode=[portal-detail-card]
+    interface PortalHeaderAction {
+        default: Component;
+    }
+}
+
+
+// 
+interface PluginApp {
+  history: ReturnType<typeof useHistory>;
+  lang: 'en-US' | 'zh-CN',
+
+  // internal only
+  http: typeof http;
+}
+```
+<!-- 
 ## `portal-detail-card`
+-   图片
+    ![portal detail card](/portal-detail-card.jpeg)
 -   Export Interface
     ```ts
-    interface ExportInterface {
-        render: PluginConfig['render'];
+    interface ExportInterface extends PluginExport.Component {
         gridConfig?: {
             xs?: number;
             sm?: number;
@@ -45,14 +74,48 @@ layout: doc
             xxl?: number;
         }
     }
-    export config as ExportInterface;
+    export pluginExport as ExportInterface;
     ```
 -   Detail
-    -   `render` 同 `Component Plugin` 的 `render`，具体可以参考 [Component Plugin]()
-    -   `gridConfig` 是一个可选的配置，用于控制 Portal分发页面中的卡片布局，具体的配置可以参考 [antd grid](https://ant.design/components/grid-cn/#Col)
+    -   在 `component plugin` 导出的基础上加伤 `gridConfig` （[Component Plugin]()）
+    -   `gridConfig` 是一个可选的配置，用于控制 **Portal详情，分发和预览**页面中的卡片布局，具体的配置可以参考 [antd grid](https://ant.design/components/grid-cn/#Col)
+-   Props interface
+```ts
+// TODO
+``` -->
+
+## global-left-menu
+-   图片
+-   Export interface 
+    ```ts
+    interface MenuItem {
+        key: string;
+        path: string;
+        icon: string;
+        title: string
+    }
+    type ExportInterface = () => MenuItem[];
+    export default exportConfig as ExportInterface;
+    ```
 
 
-## `portal-header-action`
+## portal-header-action-left
+-   图片
+-   Export Interface
+    ```ts
+    export default exportConfig as PluginExport.Component;
+    ```
+
+## portal-header-action-right
+-   图片
+-   Export Interface
+    ```ts
+    export default exportConfig as PluginExport.Component;
+    ```
+
+##  ~~`portal-header-action`    @deprecated~~
+-   图片
+    ![portal header action](/portal-header-action.jpeg)
 -   Export Interface
     ```ts
     interface App {
@@ -113,7 +176,10 @@ layout: doc
     ```
     :::
 
-## portal-detail-operation-more
+
+## `portal-detail-operation-more`
+-   图片
+    ![portal-detail-operation-more](/portal-detail-operation-more.jpeg)
 -   Export Interface
     ```ts
     interface MenuItem {
@@ -139,13 +205,19 @@ layout: doc
         /** 按钮tooltip文案 */
         tooltip?: string | (() => string | undefined)
     }
-    export default config as MenuItem[]
+
+    type ExportInterface = 
+        | (app: PluginApp) => MenuItem[] 
+        | MenuItem[]
+
+    // default export
+    export default pluginExport as ExportInterface
     ```
 -   Detail
-    -  接受 `default` 数组导出配置。
+    -  接受 `default` 导出配置。
     -  接受 icon 的形式:
-       -  1. svg icon: `<svg>...</svg>`
-       -  2. svg 转成 data uri 之后的：`data:image/svg+xml,...`
+       -  1. svg xml: `<svg>...</svg>`
+       -  2. svg dataUri：`data:image/svg+xml,...`
   
 -   Example
     ::: details Click me to view the code
@@ -186,7 +258,8 @@ layout: doc
 
 
 ## `material-library-operation-more` 
-同 [portal-detail-operation-more](#portal-detail-operation-more)
-
-
-## 
+同 [portal-detail-operation-more](#portal-detail-operation-more), 除了 `MenuItem` 的 `onClick` 的入参:
+-   Export Interface
+```ts
+onClick?: (data: any) => void;
+```

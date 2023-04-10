@@ -10,8 +10,7 @@ layout: doc
 
 iframe 和主 App 之间通过 postMessage 进行通信。
 
-1. 确保在 iframe 应用 `onMount` 的时候，向主 App 发送 `ready` 事件
-2. `from` 字段传入正确的, 当前插件对应插槽的 `slot-code`。
+确保在 嵌入在 slot 里的 iframe 应用 `onMount` 的时候，向主 App 发送 `ready` 事件
 
 ::: code-group
 
@@ -24,11 +23,10 @@ const IframeApp = () => {
             window.postMessage(
                 {
                     event: "ready",
-                    payload: {
+                    data: {
                         // 传递给主 App 的数据
-                        data: "hello world",
+                        greetings: "hello world",
                     },
-                    from: "{{ slot-code }}",
                 },
                 "*"
             );
@@ -36,8 +34,12 @@ const IframeApp = () => {
     }, []);
 };
 ```
-
 :::
+
+### Events
+-   `ready`
+-   `props`
+-   `invoke-function` | `invoke-function-result`
 
 ## Component plugin
 

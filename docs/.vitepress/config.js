@@ -2,7 +2,9 @@ export default {
     title: 'Tezign DAM Plugin',
     themeConfig: {
         nav: [
-            { text: 'plugins', link: '/guide/' },
+            { text: 'Plugins', link: '/guide/introduction' },
+            {text: '联系开发者', link: '/contact/member' },
+             {text: 'beta-0.0.0', link: ''}
         ],
         // sidebar: {
         //     '/plugins/': [
@@ -34,12 +36,24 @@ export default {
                         { text: 'Plugin Type', link: '/guide/plugin-index' },
                         { text: 'Communication', link: '/guide/communication' },
                     ]
+                },
+                {
+                    text: 'Examples',
+                    items: [
+                        { text: '流程简介&简单范例', link: '/guide/example-readiness' },
+                    ]
+                },
+                {
+                    text: 'CLI',
+                    items: [
+                        { text: 'Working in progress', link: '/' },
+                    ]
                 }
             ],
             
         },
         footer: {
-            copyright: 'Copyright © 2023 Tezign'
+            copyright: 'Copyright © 2023 Felix Zhang',
         },
         lastUpdatedText: 'Updated Date'
     },

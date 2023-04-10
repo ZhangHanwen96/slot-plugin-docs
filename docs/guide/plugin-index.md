@@ -12,6 +12,8 @@ editLink: true
 
 component plugin 的组件会被作为一个 [`Web Component`](https://developer.mozilla.org/en-US/docs/Web/Web_Components) 渲染到 Slot 中，并且支持开启 [Shadow Dom](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)。这样做的好处是，可以避免 CSS 样式污染，也可以避免不同插件之间的 DOM 事件冲突。
 
+
+
 ::: code-group
 
 ```ts [react-18.tsx]
@@ -33,64 +35,58 @@ export const render = (root: HTMLDivElement | ShadowDom, props: any) => {
     ReactDOM.render(<App {...props} />, root);
 };
 ```
-<!-- ```ts [vue-plugin.tsx]
-import App from "./App.vue";
-import { createApp, h } from "vue";
-export const render = (root: HTMLDivElement | ShadowDom, props: any) => {
-    const app = createApp(App, {  // [!code --]
-        props, // [!code --]
-    }); // [!code --]
-    // 需要传入render函数的方式创建，才能
-    const app = createApp({ // [!code ++]
-        render: () => h(App, {}), // [!code ++]
-    }); // [!code ++]
-    app.mount(root);
-};
-``` -->
 :::
 
+![web component](/web-component-sreenshot.jpeg)
+
   
-### <span style="color: var(--vp-c-brand)">Plugin Export 规范</span>
+### <span style="color: var(--vp-c-brand)">Plugin 配置导出规范</span>
 不接受 `default` 导出，接受具名导出，如下：
+
 ```ts
-type PluginConfig = {
-    render(root: HTMLDivElement | ShadowRoot, props: any, app?: any): void;
-    /**
-     * default true
-     */
-    useShadowDom?: boolean;
-    cssString?: string;
+namespace PluginExport {
+    interface Component {
+        render: ((container: HTMLElement | ShadowRoot, props: any) => void);
+        cssString?: string;
+        useShadowDom?: boolean;
+    }
 }
 
-export config: PluginConfig;
+export pluginExport as PluginExport.Component;
 ```
 
-### `Shadow Dom`。
+### `Shadow Dom`
 - #### Shadow Dom 默认开启，控制开关为 `useShadowDom` 字段:
 ```ts:line-numbers {5}
 const render = (...) => {...}
 const useShadowDom = false;
+
+
 export {
     render,
     useShadowDom,
 }
 ```
-- #### Shadow Dom 样式
+
+
+- #### Shadow Dom 的 `CSS` 样式
 Shadow Dom 具有天然样式隔离（shadow root里面和外层的样式互不影响,），但是外层的 css variable和一些可继承的属性，会被继承到 Shadow Dom 里面（font-family等）。 
 
-css 样式正常会直接注入到全局(header元素下面), 使用shadow dom到话需要把 css 注入到 shadow root 下面，所以需要以具名变量的方式导出 plugin 的 css, 有两种方式：
+css 样式正常会直接注入到全局 (header 下面), 而使用 `shadow dom` 到话需要把 css 注入到 `shadow root` 下面，所以需要以具名变量 (`cssString`) 的方式导出 plugin 的 css, 有两种方式：
+
+
 1. 一种是使用我们提供的 vite plugin
     ::: danger
-    TODO
+    Work In Progress
     :::
 2. 手动导出
-    vite 提供 inline css import, 以 `?inline` 作为 import 的后缀:
+    vite 提供 [Inline CSS Import](https://vitejs.dev/guide/features.html#disabling-css-injection-into-the-page), 以 `?inline` 作为 import 路径的后缀:
     ```ts
     import appCssString from './app.module.scss?inline';
     console.log(appCssString) // { root: {display: flex, background: red}...}
     ```
 
-    所以你需要手动以 inline css 的方式 import 所有依赖的 css, 然后把它们拼接起来，作为 plugin 的 css 字符串导出:
+    所以你需要手动以 `inline css import` 的方式 import 所有依赖的 css, 然后把字符串拼接起来，作为变量 `cssString` 字符串导出:
 
     ```ts
     import appCssString from './app.module.scss?inline';
